@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -44,14 +45,15 @@ namespace RedisDemo.Controllers
             _logger.LogWarning("The Redis does not contains the key");
 
             var countries = _context.Countries.ToList();
+            var json = JsonSerializer.Serialize<List<Country>>(countries);
 
             var memoryCacheEntryOptions = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
-                SlidingExpiration = TimeSpan.FromSeconds(60),
+                SlidingExpiration = TimeSpan.FromSeconds(10),
             };
 
-            await _distributedCache.SetStringAsync(CountriesKey, countries[0].ToString(), memoryCacheEntryOptions);
+            await _distributedCache.SetStringAsync(CountriesKey, json, memoryCacheEntryOptions);
 
             return Ok(countries);
         }
