@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using RedisDemo.Data;
 using RedisDemo.Models;
+using RedisDemo.Infra;
 
 namespace RedisDemo
 {
@@ -36,16 +37,17 @@ namespace RedisDemo
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.InstanceName = "Redis Instance";
                 options.Configuration = "localhost:6379";
             });
 
-            services.AddDbContext<ApplicationContext>((provider, options) => 
+            services.AddDbContext<ApplicationContext>((provider, options) =>
             {
                 options.UseNpgsql("Host=localhost;Database=RedisDemo;Username=postgres;Password=123");
                 options.LogTo(Console.WriteLine);
                 options.EnableSensitiveDataLogging();
             });
+
+            services.AddScoped<ICacheProvider, CacheProvider>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -81,14 +83,14 @@ namespace RedisDemo
 
             if (db.Database.EnsureCreated())
             {
-                db.Countries.AddRange(new Country[] 
+                db.Countries.AddRange(new Country[]
                 {
-                    new Country 
+                    new Country
                     {
                         Name = "Brazil",
                         Capital = "Brasilia",
                     },
-                    new Country 
+                    new Country
                     {
                         Name = "Japan",
                         Capital = "Tokyo",
