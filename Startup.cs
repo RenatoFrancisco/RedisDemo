@@ -42,7 +42,8 @@ namespace RedisDemo
 
             services.AddDbContext<ApplicationContext>((provider, options) =>
             {
-                options.UseNpgsql("Host=localhost;Database=RedisDemo;Username=postgres;Password=123");
+                //options.UseNpgsql("Host=localhost;Database=RedisDemo;Username=postgres;Password=123");
+                options.UseSqlite("Data source=app.db");
                 options.LogTo(Console.WriteLine);
                 options.EnableSensitiveDataLogging();
             });
